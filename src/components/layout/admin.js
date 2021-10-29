@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout, Menu, PageHeader, Description  } from "antd";
+import { Layout, Menu  } from "antd";
 import {
   CustomerServiceOutlined,
   UserOutlined,
@@ -11,7 +11,7 @@ import Service from "../../features/service";
 import NotFound from '../common/not_found';
 import { Link } from "react-router-dom";
 
-const { Header, Footer, Sider, Content } = Layout;
+const {  Sider } = Layout;
 
 const AdminLayout = () => {
   const [collapse, setCollapse] = useState(true);

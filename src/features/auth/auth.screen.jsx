@@ -1,7 +1,9 @@
-import React,{useState}from "react";
+import React from "react";
 import "antd/dist/antd.css";
-import { Form, Input, Button, Checkbox, notification, Space } from "antd";
+import { Form, Input, Button, notification, Space } from "antd";
+import { useHistory } from "react-router-dom";
 import userService from "../../services/user";
+
 
 const openNotificationWithIcon = (type, message) => {
   notification[type]({
@@ -11,6 +13,7 @@ const openNotificationWithIcon = (type, message) => {
 
 
 const Login = (props) => {
+  const history=  useHistory();
   const onFinish = async (values) => {
 
     //format username
@@ -28,7 +31,7 @@ const Login = (props) => {
     if (respone.code === 200 && respone.data.user.role_id === 3) {
       localStorage.setItem("ACCESS_TOKEN", respone.data.token);
       openNotificationWithIcon("success", respone.message);
-      // props.history.push('/admin/product');
+      history.push('/admin/product');
       
     } else {
       openNotificationWithIcon("error", respone.message);
@@ -79,17 +82,6 @@ const Login = (props) => {
           ]}
         >
           <Input.Password />
-        </Form.Item>
-
-        <Form.Item
-          name="remember"
-          valuePropName="checked"
-          wrapperCol={{
-            offset: 8,
-            span: 16,
-          }}
-        >
-          <Checkbox>Remember me</Checkbox>
         </Form.Item>
 
         <Form.Item

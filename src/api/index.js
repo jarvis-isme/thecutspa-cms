@@ -3,7 +3,7 @@ import queryString from "query-string";
 
 //config
 const axiosClient = axios.create({
-  baseURL: process.env.PREFIX_URL,
+  baseURL: process.env.PREFIX_URL || "https://thespacut.herokuapp.com/api/",
   headers: {
     "content-type": "application/json"
   },
