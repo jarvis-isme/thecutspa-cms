@@ -28,6 +28,24 @@ class ProductService {
     }
     return response;
   }
+  async create(params) {
+    try {
+      var response = await productApi.createProduct(params);
+      // console.log(response);
+    } catch (error) {
+      return error.response.data;
+    }
+    return response;
+  }
+  async update(params, productId) {
+    try {
+      var response = await productApi.updateProduct(params, productId);
+      // console.log(response);
+    } catch (error) {
+      return error.response.data;
+    }
+    return response;
+  }
 }
 const productService = new ProductService();
 export default productService;
