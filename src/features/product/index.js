@@ -10,21 +10,36 @@ import {
   Input,
   Select,
   Upload,
-  Image,
+  notification,
+  Popconfirm,
+  Switch,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import productService from "../../services/product";
 import logo from "../../assert/thecutspa.png";
 import "./style.css";
 
 const { Option } = Select;
 
+const openNotificationWithIcon = (type, message) => {
+  notification[type]({
+    message: message,
+  });
+};
+
 const Product = () => {
   const columns = [
     {
-      title: "Id",
+      title: "ID",
       dataIndex: "id",
       key: "id",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.id - b.id,
     },
     {
       title: "Name",
@@ -71,12 +86,26 @@ const Product = () => {
       key: "id",
       render: (id) => (
         <div>
-          <Button type="primary" onClick={() => handleShowModalSearch(id)}>
-            Update
-          </Button>
-          <Button onClick={() => handleDelete(id)} type="danger">
-            Delete
-          </Button>
+          <Button
+            icon={<EditOutlined />}
+            type="primary"
+            onClick={() => handleShowModalSearch(id)}
+          ></Button>
+          <Popconfirm
+            placement="bottomLeft"
+            title={"Do you really want to delete  this product?"}
+            onConfirm={() => handleDelete(id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              style={{
+                marginLeft: 30,
+              }}
+              icon={<DeleteOutlined />}
+              type="danger"
+            ></Button>
+          </Popconfirm>
         </div>
       ),
     },
@@ -87,26 +116,30 @@ const Product = () => {
   const [listCategory, setListCategory] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
   const [isVisibleAdd, setIsVisivleAdd] = useState(false);
+  const [subLoading, setSubLoading] = useState(false);
+
   useEffect(() => {
     fetchData();
-  }, [loading]);
+  }, [subLoading]);
 
+  // fetch data
   const fetchData = async () => {
     const response = await productService.getAll();
     console.log(response);
     setListProduct(response.data.products);
     setListCategory(response.data.categories);
     setLoading(false);
-  };
-  if (loading) {
-    return <Skeleton />;
-  }
-  const handleDelete = async (id) => {
-    const response = await productService.delete(id);
-    console.log(response);
-    setLoading(!loading);
+    setSubLoading(false);
   };
 
+  //handle delete product
+  const handleDelete = async (id) => {
+    setSubLoading(true);
+    const response = await productService.delete(id);
+    console.log(response);
+  };
+
+  //handle show modal
   const handleShowModalSearch = (id) => {
     var result = null;
     listProduct.forEach((product) => {
@@ -117,41 +150,115 @@ const Product = () => {
     setSelectedItem(result);
     setIsVisivle(true);
   };
+
   const handleCloseModal = () => {
     setIsVisivle(false);
     setSelectedItem(null);
   };
-  const onFinish = (values) => {
-    console.log(values);
+
+  const onFinish = async (values) => {
+    const params = new FormData();
+    params.append("name", values.name);
+    params.append("categoryId", values.category);
+    // if uploaded file
+    if (values.uploaded[0] ) {
+      params.append("file", values.uploaded[0].originFileObj);
+    }
+    params.append("description", values.description);
+    params.append("quantity", values.quantity);
+    params.append("status", values.status=== true ? 1 : 0);
+    params.append("price", values.price);
+    setSubLoading(true);
+    const response = await productService.update(params, values.productId);
+    if (response.code === 200) {
+      setSubLoading(false);
+      setIsVisivle(false);
+      openNotificationWithIcon("success", response.message);
+    } else {
+      openNotificationWithIcon("warning", response.message);
+    }
   };
+
+  const handleCreateProduct = async (values) => {
+    const params = new FormData();
+    params.append("name", values.name);
+    params.append("categoryId", values.category);
+    // if uploaded file
+    if (values.uploaded) {
+      params.append("file", values.uploaded[0].originFileObj);
+    }
+    params.append("description", values.description);
+    params.append("quantity", values.quantity);
+    params.append("price", values.price);
+    setSubLoading(true);
+    const response = await productService.create(params);
+    if (response.code === 200) {
+      setSubLoading(false);
+      setIsVisivleAdd(false);
+      openNotificationWithIcon("success", response.message);
+    } else {
+      openNotificationWithIcon("warning", response.message);
+    }
+  };
+
+  // error when input is not finished
   const onFinishFailed = (error) => {
     console.log(error);
   };
 
+  // handle event show modal add product
   const handleShowModalAdd = () => {
     setIsVisivleAdd(true);
   };
+
+  //handle choose a file
+  const uploadFile = (e) => {
+    console.log("Upload event:", e.fileList);
+
+    if (Array.isArray(e)) {
+      return e;
+    }
+
+    return e.fileList;
+  };
+
+  //render View
+  if (loading) {
+    return <Skeleton />;
+  }
   return (
-    <div>
+    <div
+      style={{
+        padding: 40,
+      }}
+    >
       <PageHeader
         title="Quản lí sản phẩm"
         className="site-page-header"
         avatar={{ logo }}
       ></PageHeader>
-      <div className="group">
-        <Button onClick={handleShowModalAdd} type="primary">
-          Add new product
-        </Button>
+      <div
+        style={{
+          marginBlockEnd: 50,
+        }}
+      >
+        <Button
+          icon={<PlusOutlined />}
+          onClick={handleShowModalAdd}
+          type="primary"
+        ></Button>
       </div>
       <Table
+        loading={subLoading}
         rowKey={(record) => record.id}
         dataSource={listProduct}
         columns={columns}
         bordered="true"
       />
       <Modal
-        title={selectedItem ? "Update" : "Create"}
+        title={"Update"}
         visible={isVisible}
+        footer={null}
         autoSize
         width={700}
         onOk={handleCloseModal}
@@ -184,7 +291,13 @@ const Product = () => {
           >
             <Input />
           </Form.Item>
-
+          <Form.Item
+            style={{
+              display: "none",
+            }}
+            name="productId"
+            initialValue={selectedItem ? selectedItem.id : 0}
+          />
           <Form.Item
             label="Quantity"
             name="quantity"
@@ -198,7 +311,6 @@ const Product = () => {
           >
             <Input type="number" />
           </Form.Item>
-
           <Form.Item
             label="Price"
             name="price"
@@ -222,19 +334,10 @@ const Product = () => {
           >
             <Input.TextArea autoSize />
           </Form.Item>
-          <Form.Item
-            label="Category"
-            initialValue={selectedItem ? selectedItem.category_id : "1"}
-          >
+          <Form.Item label="Category" name="category" initialValue={1}>
             <Select
-              onChange={(value) => {
-                let newItem = selectedItem;
-                newItem.category_id = value;
-                setSelectedItem(newItem);
-                console.log(selectedItem);
-              }}
               name="category"
-              defaultValue={selectedItem ? selectedItem.category_id : "1"}
+              defaultValue={selectedItem ? selectedItem.category_id : 1}
             >
               {listCategory.map((category) => {
                 return (
@@ -245,10 +348,40 @@ const Product = () => {
               })}
             </Select>
           </Form.Item>
-          <Form.Item label="Image">
-            <Image src={selectedItem ? selectedItem.images.filePath : ""} />
-            <Upload maxCount={1}>
-              <Button icon={<UploadOutlined />}>Upload</Button>
+          <Form.Item
+            label="Status:"
+            initialValue={selectedItem ? selectedItem.status : 0}
+            name="status"
+          >
+            <Switch defaultChecked={selectedItem ? selectedItem.status : 0} />
+          </Form.Item>
+          <Form.Item
+            label="Image"
+            name="uploaded"
+            valuePropName="fileList"
+            getValueFromEvent={uploadFile}
+          >
+            <Upload
+              name="image"
+              defaultFileList={[
+                selectedItem
+                  ? {
+                      name: "images.jpg",
+                      url: selectedItem.images.filePath,
+                      status: "done",
+                    }
+                  : "",
+              ]}
+              showUploadList={true}
+              listType="picture"
+              beforeUpload={(file) => {
+                return false;
+              }}
+              maxCount={1}
+            >
+              <Button name="image" icon={<UploadOutlined />}>
+                Edit
+              </Button>
             </Upload>
           </Form.Item>
           <Form.Item
@@ -268,7 +401,7 @@ const Product = () => {
         visible={isVisibleAdd}
         autoSize
         width={700}
-        onOk={() => setIsVisivleAdd(false)}
+        footer={null}
         onCancel={() => setIsVisivleAdd(false)}
       >
         <Form
@@ -282,7 +415,7 @@ const Product = () => {
           initialValues={{
             remember: true,
           }}
-          onFinish={onFinish}
+          onFinish={handleCreateProduct}
           // onFinishFailed={onFinishFailed}
         >
           <Form.Item
@@ -323,17 +456,20 @@ const Product = () => {
           >
             <Input type="number" />
           </Form.Item>
-          <Form.Item label="Description" name="description">
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[
+              {
+                required: true,
+                message: "Please input your description!",
+              },
+            ]}
+          >
             <Input.TextArea autoSize />
           </Form.Item>
           <Form.Item label="Category" name="category" initialValue={1}>
             <Select
-              onChange={(value) => {
-                // let newItem = selectedItem;
-                // newItem.category_id = value;
-                // setSelectedItem(newItem);
-                // console.log(selectedItem);
-              }}
               name="category"
               defaultValue={selectedItem ? selectedItem.category_id : 1}
             >
@@ -346,11 +482,24 @@ const Product = () => {
               })}
             </Select>
           </Form.Item>
-          <Form.Item label="Image"
-            name='image'
+          <Form.Item
+            label="Image"
+            name="uploaded"
+            valuePropName="fileList"
+            getValueFromEvent={uploadFile}
           >
-            <Upload name='image' maxCount={1}>
-              <Button name='image' icon={<UploadOutlined />}>Upload</Button>
+            <Upload
+              name="image"
+              showUploadList={true}
+              // onChange={uploadFile}
+              beforeUpload={(file) => {
+                return false;
+              }}
+              maxCount={1}
+            >
+              <Button name="image" icon={<UploadOutlined />}>
+                Upload
+              </Button>
             </Upload>
           </Form.Item>
           <Form.Item
@@ -359,7 +508,7 @@ const Product = () => {
               span: 16,
             }}
           >
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={subLoading}>
               Create Product
             </Button>
           </Form.Item>
