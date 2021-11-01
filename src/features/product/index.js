@@ -124,7 +124,9 @@ const Product = () => {
 
   // fetch data
   const fetchData = async () => {
+    global.loading.show();
     const response = await productService.getAll();
+    global.loading.hide();
     console.log(response);
     setListProduct(response.data.products);
     setListCategory(response.data.categories);
@@ -134,8 +136,10 @@ const Product = () => {
 
   //handle delete product
   const handleDelete = async (id) => {
+    global.loading.show();
     setSubLoading(true);
     const response = await productService.delete(id);
+    global.loading.hide();
     console.log(response);
   };
 
@@ -147,6 +151,7 @@ const Product = () => {
         result = product;
       }
     });
+    console.log(result)
     setSelectedItem(result);
     setIsVisivle(true);
   };

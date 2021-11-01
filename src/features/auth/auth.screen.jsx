@@ -23,7 +23,9 @@ const Login = (props) => {
       userId: username,
       password: values.password,
     };
+    global.loading.show();
     const respone = await userService.loginService(params);
+    global.loading.hide();
     console.log(props);
     if (respone.code === 200 && respone.data.user.role_id === 3) {
       localStorage.setItem("ACCESS_TOKEN", respone.data.token);
