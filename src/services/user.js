@@ -10,6 +10,9 @@ class UserService {
     }
     return response;
   }
+  logout(){
+    localStorage.removeItem("ACCESS_TOKEN")
+  }
 }
 
 const userService = new UserService();

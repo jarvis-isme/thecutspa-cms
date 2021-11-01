@@ -92,7 +92,9 @@ const Product = () => {
   }, [loading]);
 
   const fetchData = async () => {
+    global.loading.show();
     const response = await productService.getAll();
+    global.loading.hide();
     console.log(response);
     setListProduct(response.data.products);
     setListCategory(response.data.categories);
@@ -102,7 +104,9 @@ const Product = () => {
     return <Skeleton />;
   }
   const handleDelete = async (id) => {
+    global.loading.show();
     const response = await productService.delete(id);
+    global.loading.hide();
     console.log(response);
     setLoading(!loading);
   };
@@ -114,6 +118,7 @@ const Product = () => {
         result = product;
       }
     });
+    console.log(result)
     setSelectedItem(result);
     setIsVisivle(true);
   };
