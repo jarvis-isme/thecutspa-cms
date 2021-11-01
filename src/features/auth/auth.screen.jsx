@@ -4,18 +4,15 @@ import { Form, Input, Button, notification, Space } from "antd";
 import { useHistory } from "react-router-dom";
 import userService from "../../services/user";
 
-
 const openNotificationWithIcon = (type, message) => {
   notification[type]({
     message: message,
   });
 };
 
-
 const Login = (props) => {
-  const history=  useHistory();
+  const history = useHistory();
   const onFinish = async (values) => {
-
     //format username
     let username = values.username;
     if (!values.username.includes("@")) {
@@ -33,18 +30,26 @@ const Login = (props) => {
     if (respone.code === 200 && respone.data.user.role_id === 3) {
       localStorage.setItem("ACCESS_TOKEN", respone.data.token);
       openNotificationWithIcon("success", respone.message);
-      history.push('/admin/product');
-      
+      history.push("admin/product");
     } else {
       openNotificationWithIcon("error", respone.message);
     }
   };
-  
+
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
   };
   return (
-    <Space align="center">
+    <Space
+      size="middle"
+      style={{
+        marginTop: "10%",
+        marginLeft: "25%",
+        border: "1px solid",
+        padding: 20,
+      }}
+      align="center"
+    >
       <Form
         name="basic"
         labelCol={{

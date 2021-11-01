@@ -23,7 +23,23 @@ class ProductApi {
     const headers = {
       Authorization: `Bearer ${accessToken}`,
     };
-    return await axiosCLient.delete(url,{headers});
+    return await axiosCLient.delete(url, { headers });
+  }
+  async createProduct(params) {
+    const url = `/product/create-product`;
+    const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    return await axiosCLient.post(url, params, { headers });
+  }
+  async updateProduct(params, productId) {
+    const url = `/product/update-product/${productId}`;
+    const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    return await axiosCLient.post(url, params, { headers });
   }
 }
 const userApi = new ProductApi();

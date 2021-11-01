@@ -19,7 +19,7 @@ function App() {
         <Route path="/admin">
           <AdminLayout/>
         </Route>
-        <Route>
+        <Route paht='*'>
           <NotFound/>
         </Route>
       </Switch>
