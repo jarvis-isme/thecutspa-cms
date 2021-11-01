@@ -10,6 +10,7 @@ import { Route, Switch, useHistory } from "react-router";
 import Product from "../../features/product";
 import Service from "../../features/service";
 import NotFound from '../common/not_found';
+import StaffPage from '../../features/staff'
 import { Link } from "react-router-dom";
 import userService from "../../services/user";
 
@@ -45,6 +46,7 @@ const AdminLayout = () => {
                   Quản lý dịch vụ
                 </Menu.Item>
                 <Menu.Item key="3" icon={<UserOutlined />}>
+                  <Link to="/admin/staff"></Link>
                   Quản lý nhân viên
                 </Menu.Item>
                 <Menu.Item key="4" onClick={()=>userService.logout()} icon={<LogoutOutlined />}>
@@ -61,8 +63,11 @@ const AdminLayout = () => {
                 <Route path="/admin/service">
                   <Service />
                 </Route>
-                <Route >
-                  <NotFound/>
+                <Route path="/admin/staff">
+                  <StaffPage />
+                </Route>
+                <Route>
+                  <NotFound />
                 </Route>
               </Switch>
             </Layout>}

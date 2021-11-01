@@ -27,7 +27,7 @@ const Login = (props) => {
     const respone = await userService.loginService(params);
     global.loading.hide();
     console.log(props);
-    if (respone.code === 200 && respone.data.user.role_id === 3) {
+    if (respone.code === 200 && (respone.data.user.role_id === 3 || respone.data.user.role_id === 2)) {
       localStorage.setItem("ACCESS_TOKEN", respone.data.token);
       openNotificationWithIcon("success", respone.message);
       history.push("admin/product");
