@@ -139,8 +139,7 @@ const Service = () => {
         'name':selectedItem.name,
         'price':selectedItem.price,
         'description':selectedItem.description,
-        'subcategory':selectedItem.category_id,
-        //'image':selectedItem.images.filePath
+        'subcategory':selectedItem.category_id
       })
       detailForm.resetFields(['file'])      
       listCategory.every((category)=>{
@@ -193,11 +192,8 @@ const Service = () => {
     })
     setListService(_listService);
     setListCategory(_listCategory);
-    //setLoading(false);
   };
-  // if (loading) {
-  //   return <Skeleton />;
-  // }
+
   const handleDelete = async (id) => {
     global.loading.show()
     const res = await serviceService.deleteService(id)
@@ -229,7 +225,6 @@ const Service = () => {
   };
   const onFinish = (values) => {
     selectedItem ? onFinishUpdate(values) : onFinishedCreate(values)
-    //console.log(values);
   };
   const onFinishUpdate = async (values) => {
     const formData = new FormData()
@@ -321,7 +316,7 @@ const Service = () => {
             danger 
             type="primary"
           >
-            Add category
+            New Category
           </Button>
         </div>
         <Table
@@ -391,7 +386,7 @@ const Service = () => {
         ></PageHeader>    
         <div className="group">
           <Button icon={<PlusCircleOutlined/>}  onClick={handleShowModalAdd} type="primary">
-            Add service
+            New Service
           </Button>
         </div>   
         <Table
