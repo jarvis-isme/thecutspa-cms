@@ -10,9 +10,10 @@ import {
   Upload,
   Image,
   notification,
-  Popconfirm
+  Popconfirm,
+  Tabs
 } from "antd";
-import { UploadOutlined , PlusCircleOutlined} from "@ant-design/icons";
+import { UploadOutlined , PlusCircleOutlined, EditOutlined, DeleteOutlined} from "@ant-design/icons";
 import logo from "../../assert/thecutspa.png";
 import "./style.css";
 import serviceService from "../../services/service";
@@ -79,13 +80,9 @@ const Service = () => {
       key: "id",
       render: (id) => (
         <div>
-          <Button type="primary" onClick={() => handleShowModalSearch(id)}>
-            Update
-          </Button>
+          <Button icon={<EditOutlined/>} type="primary" onClick={() => handleShowModalSearch(id)}/>
           <Popconfirm placement="topLeft" title={`Do you want to delete this service ?`} onConfirm={() => handleDelete(id)} okText="Delete" cancelText="Cancel">
-            <Button type="danger">
-              Delete
-            </Button>
+            <Button style={{marginLeft: 30}} icon={<DeleteOutlined/>} type="danger"/>
           </Popconfirm>
           
         </div>
@@ -128,6 +125,7 @@ const Service = () => {
   const [isVisibleAddCategoryModal,setIsVisibleAddCategoryModal] = useState(false)
   const [listCategory, setListCategory] = useState([]);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedTab,setSelectedTab] = useState("0")
 
   const [detailForm] = Form.useForm() 
   const [categoryForm] = Form.useForm()
@@ -143,7 +141,8 @@ const Service = () => {
         'description':selectedItem.description,
         'subcategory':selectedItem.category_id,
         //'image':selectedItem.images.filePath
-      })      
+      })
+      detailForm.resetFields(['file'])      
       listCategory.every((category)=>{
           let isFound = false
           if(category.id === selectedItem.category_id){
@@ -158,11 +157,7 @@ const Service = () => {
           return !isFound
         })
     } else {
-      detailForm.setFieldsValue({
-        'name':'',
-        'price':'',
-        'description':'',
-      })
+      detailForm.resetFields()
       listCategory.every((category)=> {
         if(category.parent_id === null){
           detailForm.setFieldsValue({'category':category.id});
@@ -303,7 +298,14 @@ const Service = () => {
 
   return (
     <React.Fragment>
-      <div>
+      <Tabs defaultActiveKey="0" onChange={(value)=>setSelectedTab(value)} style={{marginLeft: '2vw'}}>
+        <Tabs.TabPane tab="Manage Service" key="0">
+
+        </Tabs.TabPane>
+        <Tabs.TabPane tab="Manage Category" key="1">       
+        </Tabs.TabPane>
+      </Tabs>
+      {selectedTab === "1" ? <div>
         <PageHeader
           title="Category Management"
           className="site-page-header"
@@ -314,11 +316,12 @@ const Service = () => {
             onClick={()=>{
               setIsVisibleAddCategoryModal(true) 
               categoryForm.resetFields()
-            }} 
+            }}
+            icon={<PlusCircleOutlined/>} 
             danger 
             type="primary"
           >
-            Add new category
+            Add category
           </Button>
         </div>
         <Table
@@ -331,7 +334,7 @@ const Service = () => {
           title={"Create"}
           visible={isVisibleAddCategoryModal}
           autoSize
-          width='90vw'
+          width='60vw'
           okText='Create'
           onCancel={()=>setIsVisibleAddCategoryModal(false)}
           onOk={()=>categoryForm.submit()}
@@ -372,13 +375,14 @@ const Service = () => {
                 },
               ]}
             >
-              <Upload maxCount={1} customRequest={()=>{return;}}>
+              <Upload maxCount={1} beforeUpload={()=>false}>
                 <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
           </Form>
         </Modal>
       </div>
+      :
       <div>
         <PageHeader
           title="Service Management"
@@ -386,8 +390,8 @@ const Service = () => {
           avatar={{ logo }}
         ></PageHeader>    
         <div className="group">
-          <Button onClick={handleShowModalAdd} type="primary">
-            Add new service
+          <Button icon={<PlusCircleOutlined/>}  onClick={handleShowModalAdd} type="primary">
+            Add service
           </Button>
         </div>   
         <Table
@@ -400,7 +404,7 @@ const Service = () => {
           title={selectedItem ? "Update" : "Create"}
           visible={isVisible}
           autoSize
-          width={700}
+          width='60vw'
           okText={selectedItem ? 'Save':'Create'}
           onOk={()=>detailForm.submit()}
           onCancel={handleCloseModal}
@@ -491,8 +495,7 @@ const Service = () => {
             </Form.Item>
             
             <Form.Item label="Image">
-              <Image style src={selectedItem && selectedItem.images ? selectedItem.images.filePath : ""} />
-              
+              <Image style src={selectedItem && selectedItem.images ? selectedItem.images.filePath : ""} />              
             </Form.Item>
             <Form.Item 
               label=" " 
@@ -504,13 +507,13 @@ const Service = () => {
                 },
               ]}
             >
-              <Upload ref={uploadRef} maxCount={1} customRequest={()=>{return;}}>
+              <Upload ref={uploadRef} maxCount={1} beforeUpload={()=>false}>
                 <Button icon={<UploadOutlined />}>Upload</Button>
               </Upload>
             </Form.Item>
           </Form>
         </Modal>   
-      </div>
+      </div>}
       
     </React.Fragment>    
   );
