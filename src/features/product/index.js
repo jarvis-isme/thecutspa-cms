@@ -151,7 +151,7 @@ const Product = () => {
         result = product;
       }
     });
-    console.log(result)
+    console.log(result);
     setSelectedItem(result);
     setIsVisivle(true);
   };
@@ -166,18 +166,19 @@ const Product = () => {
     params.append("name", values.name);
     params.append("categoryId", values.category);
     // if uploaded file
-    if (values.uploaded[0] ) {
+    if (values.uploaded) {
       params.append("file", values.uploaded[0].originFileObj);
     }
     params.append("description", values.description);
     params.append("quantity", values.quantity);
-    params.append("status", values.status=== true ? 1 : 0);
+    params.append("status", values.status === true ? 1 : 0);
     params.append("price", values.price);
     setSubLoading(true);
     const response = await productService.update(params, values.productId);
     if (response.code === 200) {
       setSubLoading(false);
       setIsVisivle(false);
+      setSelectedItem(null);
       openNotificationWithIcon("success", response.message);
     } else {
       openNotificationWithIcon("warning", response.message);
@@ -260,147 +261,152 @@ const Product = () => {
         columns={columns}
         bordered="true"
       />
-      <Modal
-        title={"Update"}
-        visible={isVisible}
-        footer={null}
-        autoSize
-        width={700}
-        onOk={handleCloseModal}
-        onCancel={handleCloseModal}
-      >
-        <Form
-          name="basic"
-          labelCol={{
-            span: 8,
-          }}
-          wrapperCol={{
-            span: 16,
-          }}
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-          // onFinishFailed={onFinishFailed}
+      {selectedItem ? (
+        <Modal
+          title={"Update"}
+          visible={isVisible}
+          footer={null}
+          autoSize
+          width={700}
+          onOk={handleCloseModal}
+          onCancel={handleCloseModal}
         >
-          <Form.Item
-            label="Name"
-            name="name"
-            initialValue={selectedItem ? selectedItem.name.toString() : ""}
-            rules={[
-              {
-                required: true,
-                message: "Please input your username!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            style={{
-              display: "none",
+          <Form
+            layout="vertical"
+            name="basic"
+            labelCol={{
+              span: 8,
             }}
-            name="productId"
-            initialValue={selectedItem ? selectedItem.id : 0}
-          />
-          <Form.Item
-            label="Quantity"
-            name="quantity"
-            initialValue={selectedItem ? selectedItem.quantity : 0}
-            rules={[
-              {
-                required: true,
-                message: "Please input your password!",
-              },
-            ]}
-          >
-            <Input type="number" />
-          </Form.Item>
-          <Form.Item
-            label="Price"
-            name="price"
-            initialValue={selectedItem ? selectedItem.price : 0}
-            rules={[
-              {
-                required: true,
-                message: "Please input your price!",
-              },
-            ]}
-          >
-            <Input
-              type="number"
-              defaultValue={selectedItem ? selectedItem.price : 0}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Description"
-            initialValue={selectedItem ? selectedItem.description : 0}
-            name="description"
-          >
-            <Input.TextArea autoSize />
-          </Form.Item>
-          <Form.Item label="Category" name="category" initialValue={1}>
-            <Select
-              name="category"
-              defaultValue={selectedItem ? selectedItem.category_id : 1}
-            >
-              {listCategory.map((category) => {
-                return (
-                  <Option key={category.id} value={category.id}>
-                    {category.name}
-                  </Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="Status:"
-            initialValue={selectedItem ? selectedItem.status : 0}
-            name="status"
-          >
-            <Switch defaultChecked={selectedItem ? selectedItem.status : 0} />
-          </Form.Item>
-          <Form.Item
-            label="Image"
-            name="uploaded"
-            valuePropName="fileList"
-            getValueFromEvent={uploadFile}
-          >
-            <Upload
-              name="image"
-              defaultFileList={[
-                selectedItem
-                  ? {
-                      name: "images.jpg",
-                      url: selectedItem.images.filePath,
-                      status: "done",
-                    }
-                  : "",
-              ]}
-              showUploadList={true}
-              listType="picture"
-              beforeUpload={(file) => {
-                return false;
-              }}
-              maxCount={1}
-            >
-              <Button name="image" icon={<UploadOutlined />}>
-                Edit
-              </Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item
             wrapperCol={{
-              offset: 8,
               span: 16,
             }}
+            initialValues={{
+              remember: true,
+            }}
+            onFinish={onFinish}
+            // onFinishFailed={onFinishFailed}
           >
-            <Button type="primary" htmlType="submit">
-              Update Product
-            </Button>
-          </Form.Item>
-        </Form>
-      </Modal>
+            <Form.Item
+              label="Name"
+              name="name"
+              initialValue={selectedItem ? selectedItem.name.toString() : ""}
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your username!",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item
+              style={{
+                display: "none",
+              }}
+              name="productId"
+              initialValue={selectedItem ? selectedItem.id : 0}
+            />
+            <Form.Item
+              label="Quantity"
+              name="quantity"
+              initialValue={selectedItem ? selectedItem.quantity : 0}
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your password!",
+                },
+              ]}
+            >
+              <Input type="number" />
+            </Form.Item>
+            <Form.Item
+              label="Price"
+              name="price"
+              initialValue={selectedItem ? selectedItem.price : 0}
+              rules={[
+                {
+                  required: true,
+                  message: "Please input your price!",
+                },
+              ]}
+            >
+              <Input
+                type="number"
+                defaultValue={selectedItem ? selectedItem.price : 0}
+              />
+            </Form.Item>
+            <Form.Item
+              label="Description"
+              initialValue={selectedItem ? selectedItem.description : 0}
+              name="description"
+            >
+              <Input.TextArea autoSize />
+            </Form.Item>
+            <Form.Item label="Category" name="category" initialValue={1}>
+              <Select
+                name="category"
+                defaultValue={selectedItem ? selectedItem.category_id : 1}
+              >
+                {listCategory.map((category) => {
+                  return (
+                    <Option key={category.id} value={category.id}>
+                      {category.name}
+                    </Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              label="Status:"
+              initialValue={selectedItem ? selectedItem.status : 0}
+              name="status"
+            >
+              <Switch defaultChecked={selectedItem ? selectedItem.status : 0} />
+            </Form.Item>
+            <Form.Item
+              label="Image"
+              name="uploaded"
+              valuePropName="fileList"
+              getValueFromEvent={uploadFile}
+            >
+              <Upload
+                name="image"
+                defaultFileList={[
+                  selectedItem
+                    ? {
+                        name: "images.jpg",
+                        url: selectedItem.images.filePath,
+                        status: "done",
+                      }
+                    : "",
+                ]}
+                showUploadList={true}
+                listType="picture"
+                beforeUpload={(file) => {
+                  return false;
+                }}
+                maxCount={1}
+              >
+                <Button name="image" icon={<UploadOutlined />}>
+                  Edit
+                </Button>
+              </Upload>
+            </Form.Item>
+            <Form.Item
+              wrapperCol={{
+                offset: 8,
+                span: 16,
+              }}
+            >
+              <Button type="primary" htmlType="submit">
+                Update Product
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+      ) : (
+        <div />
+      )}
       <Modal
         title={"Create"}
         visible={isVisibleAdd}
@@ -410,6 +416,7 @@ const Product = () => {
         onCancel={() => setIsVisivleAdd(false)}
       >
         <Form
+          layout="vertical"
           name="basic"
           labelCol={{
             span: 8,
