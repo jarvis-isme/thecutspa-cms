@@ -8,18 +8,17 @@ import {
   Upload,
   Button,
   Typography,
-  
 } from "antd";
 import moment from "moment";
 import React, { useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
-import { handleShifts, openNotificationWithIcon } from "../../utils";
+import { handleShift, handleShifts, handleSkills, openNotificationWithIcon } from "../../utils";
 import staffService from "../../services/staff";
 
 const { Option } = Select;
 const { Step } = Steps;
 
-const CreateStaffPage = (props) => {
+const UpdateStaffPage = (props) => {
   const [current, setCurrent] = useState(0);
 
   const steps = [
@@ -36,37 +35,30 @@ const CreateStaffPage = (props) => {
       content: "Last-content",
     },
   ];
-  const handleAdd = async (values) => {
-    console.log(values);
+
+  const handleUpdate = async (values) => {
     const shitfIds = handleShifts(values);
-    console.log(shitfIds);
     const formData = new FormData();
     formData.append("name", values.name);
     if (values.email) {
       formData.append("email", values.email);
     }
+    values.skills.forEach((item, index) => {
+      formData.append(`skillIds[${index}]`, item);
+    }); 
     formData.append("password", "staff123");
     formData.append("gender", values.gender);
     shitfIds.forEach((item, index) => {
       formData.append(`shiftIds[${index}]`, item);
     });
-    values.skills.forEach((item, index) => {
-      console.log('test');
-      formData.append(`skillIds[${index}]`, item);
-    });
     formData.append("birthDay", values.birthday.format("YYYY-MM-DD"));
     formData.append("phone", values.phone);
-    if (values.uploaded.length !== 0) {
+    if (values.uploaded.length !== 0 && values.uploaded[0].status !== "done") {
       formData.append("file", values.uploaded[0].originFileObj);
     }
     console.log(values.birthday.format("YYYY-MM-DD"));
-    const respone = await staffService.createStaff(formData);
-    console.log(respone);
-    if(respone.code===200){
-      openNotificationWithIcon('success',respone.message);
-    }else{
-      openNotificationWithIcon('error', respone.message);
-    }
+    const respone = await staffService.updateStaff(values.staffId, formData);
+    openNotificationWithIcon(respone.code ===200? 'success':'warning', respone.message);
   };
 
   return (
@@ -75,17 +67,16 @@ const CreateStaffPage = (props) => {
       visible={props.visible}
       footer={null}
       onCancel={props.onCancel}
-      title="Create Staff"
+      title="Update Staff"
     >
-      <Form name="form_add" layout="vertical" onFinish={handleAdd}>
+      <Form name="form_add" layout="vertical" onFinish={handleUpdate}>
         <Steps current={current}>
           {steps.map((item) => (
             <Step key={item.title} title={item.title} />
           ))}
         </Steps>
         <div className="steps-content">
-          <AddFormInformation skills={props.skills}/>
-        
+          <AddFormInformation skills={props.skills} staff={props.staff} />
           <Typography.Paragraph
             style={{
               fontWeight: "bold",
@@ -93,7 +84,15 @@ const CreateStaffPage = (props) => {
           >
             Staff's work schedule:
           </Typography.Paragraph>
-          <Form.Item name="monday" label="Monday:">
+          <Form.Item
+            name="monday"
+            label="Monday:"
+            initialValue={
+              props.staff.shifts["1"]
+                ? handleShift(props.staff.shifts["1"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -107,7 +106,15 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="tuesday" label="Tuesday:">
+          <Form.Item
+            name="tuesday"
+            label="Tuesday:"
+            initialValue={
+              props.staff.shifts["2"]
+                ? handleShift(props.staff.shifts["2"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -121,7 +128,15 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="wednesday" label="Wednesday:">
+          <Form.Item
+            name="wednesday"
+            label="Wednesday:"
+            initialValue={
+              props.staff.shifts["3"]
+                ? handleShift(props.staff.shifts["3"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -135,7 +150,15 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="thursday" label="Thursday:">
+          <Form.Item
+            name="thursday"
+            label="Thursday:"
+            initialValue={
+              props.staff.shifts["4"]
+                ? handleShift(props.staff.shifts["4"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -149,7 +172,15 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="friday" label="Friday:" initialValue={[]}>
+          <Form.Item
+            name="friday"
+            label="Friday:"
+            initialValue={
+              props.staff.shifts["5"]
+                ? handleShift(props.staff.shifts["5"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -163,7 +194,15 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="saturday" label="Saturday:" initialValue={[]}>
+          <Form.Item
+            name="saturday"
+            label="Saturday:"
+            initialValue={
+              props.staff.shifts["6"]
+                ? handleShift(props.staff.shifts["6"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -177,7 +216,15 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item name="sunday" label="Sunday:" initialValue={[]}>
+          <Form.Item
+            name="sunday"
+            label="Sunday:"
+            initialValue={
+              props.staff.shifts["0"]
+                ? handleShift(props.staff.shifts["0"])
+                : []
+            }
+          >
             <Select
               mode="multiple"
               allowClear
@@ -191,7 +238,9 @@ const CreateStaffPage = (props) => {
               ))}
             </Select>
           </Form.Item>
+          <Form.Item name="staffId" initialValue={props.staff.id} />
         </div>
+
         <div className="steps-action">
           <Form.Item>
             <Button htmlType="submit" type="primary">
@@ -203,7 +252,7 @@ const CreateStaffPage = (props) => {
     </Modal>
   );
 };
-export default CreateStaffPage;
+export default UpdateStaffPage;
 
 const AddFormInformation = (props) => {
   //handle upload image
@@ -235,7 +284,7 @@ const AddFormInformation = (props) => {
             message: "Please input your name",
           },
         ]}
-        initialValue={""}
+        initialValue={props.staff.name}
       >
         <Input />
       </Form.Item>
@@ -248,7 +297,7 @@ const AddFormInformation = (props) => {
             message: "Please input your phone!",
           },
         ]}
-        initialValue={""}
+        initialValue={props.staff.phone}
       >
         <Input />
       </Form.Item>
@@ -262,9 +311,10 @@ const AddFormInformation = (props) => {
           },
           {
             required: true,
-            message: "Please input staff's birthday",
+            message: "Please input your email!",
           },
         ]}
+        initialValue={props.staff.email ? props.staff.email : ""}
       >
         <Input />
       </Form.Item>
@@ -277,9 +327,9 @@ const AddFormInformation = (props) => {
             message: "Please select staff's gender!",
           },
         ]}
-        initialValue={0}
+        initialValue={props.staff.gender}
       >
-        <Select defaultValue={0}>
+        <Select defaultValue={props.staff.gender}>
           <Option value={0}>Male</Option>
           <Option value={1}>Female</Option>
         </Select>
@@ -293,9 +343,12 @@ const AddFormInformation = (props) => {
             message: "Please input staff's birthday",
           },
         ]}
-        initialValue={""}
+        initialValue={moment(props.staff.birthDay)}
       >
         <DatePicker
+          defaultValue={
+            props.staff.birthDay ? moment(props.staff.birthDay) : null
+          }
           format={"YYYY-MM-DD"}
           disabledDate={(current) => {
             return current && current > moment().subtract(18, "year");
@@ -306,6 +359,7 @@ const AddFormInformation = (props) => {
       <Form.Item
         name="skills"
         label="Skills:"
+        initialValue={handleSkills(props.staff.skills)}
         rules={[
           {
             required: true,
@@ -330,7 +384,13 @@ const AddFormInformation = (props) => {
         label="Image:"
         name="uploaded"
         valuePropName="fileList"
-        initialValue={[]}
+        initialValue={[
+          {
+            status: "done",
+            url: props.staff.avatar.filePath,
+            name: "image.png",
+          },
+        ]}
         getValueFromEvent={uploadFile}
       >
         <Upload
