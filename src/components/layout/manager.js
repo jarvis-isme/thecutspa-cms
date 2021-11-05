@@ -17,12 +17,12 @@ import { USER_ROLE } from "../../constant";
 
 const {  Sider } = Layout;
 
-const AdminLayout = () => {
+const ManagerLayout = () => {
   const _useHistory = useHistory()
   const [loading, setLoading] = useState(true)
   useEffect(()=>{
     if(!localStorage.getItem('ACCESS_TOKEN')) _useHistory.replace('/')
-    if( localStorage.getItem('ROLE') != USER_ROLE.ADMIN) _useHistory.push('/private') 
+    if( localStorage.getItem('ROLE') != USER_ROLE.MANAGER) _useHistory.push('/private') 
     else setLoading(false)
   },[])
   const [collapse, setCollapse] = useState(true);
@@ -39,18 +39,18 @@ const AdminLayout = () => {
               onCollapse={() => setCollapse(!collapse)}
             >
               <Menu theme="dark" defaultSelectedKeys={["1"]}>
-                <Menu.Item  key="1" icon={<DashOutlined />}>
+                {/* <Menu.Item  key="1" icon={<DashOutlined />}>
                   <Link to="/admin/product"></Link>
                   Quản lý sản phẩm
-                </Menu.Item>
-                <Menu.Item key="2" icon={<CustomerServiceOutlined />}>
-                  <Link to="/admin/service"></Link>
+                </Menu.Item> */}
+                <Menu.Item key="1" icon={<CustomerServiceOutlined />}>
+                  <Link to="/manager/service"></Link>
                   Quản lý dịch vụ
                 </Menu.Item>
-                {/* <Menu.Item key="3" icon={<UserOutlined />}>
-                  <Link to="/admin/staff"></Link>
+                <Menu.Item key="2" icon={<UserOutlined />}>
+                  <Link to="/manager/staff"></Link>
                   Quản lý nhân viên
-                </Menu.Item> */}
+                </Menu.Item>
                 <Menu.Item key="3" onClick={()=>userService.logout()} icon={<LogoutOutlined />}>
                   <Link to="/"/>
                   Đăng xuất
@@ -59,15 +59,15 @@ const AdminLayout = () => {
             </Sider>
             {!loading && <Layout className="site-layout">
               <Switch>
-                <Route path="/admin/product">
+                {/* <Route path="/manager/product">
                   <Product />
-                </Route>
-                <Route path="/admin/service">
+                </Route> */}
+                <Route path="/manager/service">
                   <Service />
                 </Route>
-                {/* <Route path="/admin/staff">
+                <Route path="/manager/staff">
                   <StaffPage />
-                </Route> */}
+                </Route>
                 <Route>
                   <NotFound />
                 </Route>
@@ -78,4 +78,4 @@ const AdminLayout = () => {
       </div>
     );
 };
-export default AdminLayout;
+export default ManagerLayout;

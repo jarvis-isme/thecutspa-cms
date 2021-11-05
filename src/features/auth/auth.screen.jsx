@@ -3,6 +3,7 @@ import "antd/dist/antd.css";
 import { Form, Input, Button, notification, Space } from "antd";
 import { useHistory } from "react-router-dom";
 import userService from "../../services/user";
+import { USER_ROLE } from "../../constant";
 
 const openNotificationWithIcon = (type, message) => {
   notification[type]({
@@ -27,10 +28,12 @@ const Login = (props) => {
     const respone = await userService.loginService(params);
     global.loading.hide();
     console.log(props);
-    if (respone.code === 200 && (respone.data.user.role_id === 3 || respone.data.user.role_id === 2)) {
+    if (respone.code === 200 && (respone.data.user.role_id === USER_ROLE.ADMIN || respone.data.user.role_id === USER_ROLE.MANAGER)) {
       localStorage.setItem("ACCESS_TOKEN", respone.data.token);
+      localStorage.setItem("ROLE", respone.data.user.role_id);
       openNotificationWithIcon("success", respone.message);
-      history.push("admin/product");
+      if(respone.data.user.role_id === USER_ROLE.ADMIN) history.replace("admin/product");
+      else history.replace("manager/service")
     } else {
       openNotificationWithIcon("error", respone.message);
     }

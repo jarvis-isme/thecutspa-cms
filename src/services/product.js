@@ -46,6 +46,30 @@ class ProductService {
     }
     return response;
   }
+  async getProductOrder(data){
+    try {
+      var response = await productApi.getProductOrder(data)
+    } catch (error) {
+      return error
+    }
+    return response
+  }
+  async cancelProductOrder(id,data){
+    try {
+      var response = await productApi.cancelProductOrder(id,data)
+    } catch (error) {
+      return error
+    }
+    return response
+  }
+  async confirmProductOrder(id){
+    try {
+      var response = await productApi.confirmProductOrder(id)
+    } catch (error) {
+      return error
+    }
+    return response
+  }
 }
 const productService = new ProductService();
 export default productService;

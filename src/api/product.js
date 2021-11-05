@@ -41,6 +41,30 @@ class ProductApi {
     };
     return await axiosCLient.post(url, params, { headers });
   }
+  async getProductOrder(data){
+    const url = `manager/product-order/get`;
+    const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    return await axiosCLient.post(url, data, { headers });
+  }
+  async confirmProductOrder(id){
+    const url = `manager/product-order/confirm/${id}`
+    const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    return await axiosCLient.get(url, { headers });
+  }
+  async cancelProductOrder(id,data){
+    const url = `manager/product-order/cancel/${id}`
+    const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    return await axiosCLient.post(url, data,{ headers });
+  }
 }
 const userApi = new ProductApi();
 export default userApi;
