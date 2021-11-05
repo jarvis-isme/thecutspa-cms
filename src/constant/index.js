@@ -1,0 +1,28 @@
+export const SERVICE_ORDER_STATUS = {
+    CUSTOMER_CANCEL : 0,
+    ADMIN_MANAGER_CANCEL: 1,
+    NOT_CONFIRM: 2,
+    CONFIRMED: 3,
+    USED: 4
+}
+export const PRODUCT_ORDER_STATUS = {
+    CUSTOMER_CANCEL: 0,
+    ADMIN_CANCEL: 1,
+    NOT_CONFIRM: 2,
+    CONFIRMED: 3,
+    DELIVERY: 4,
+    COMPLETED: 5
+}
+export const PRODUCT_ORDER_SHIPPING_METHOD ={
+    STANDARD: "0",
+    FAST: "1" 
+}
+export const PRODUCT_ORDER_PAYMENT_METHOD = {
+    COD: "0",
+    CREDIT_CARD: "1"
+}
+
+export const USER_ROLE = {
+    ADMIN : 3,
+    MANAGER: 2
+}

@@ -9,6 +9,14 @@ class ServiceApi {
     };
     return await axiosClient.get(url, { headers });
   }
+  async getAllServiceCategory(){
+    const url = "https://thespacut.herokuapp.com/api/service-category/get-all"
+    const accessToken = localStorage.getItem("ACCESS_TOKEN");
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+    return await axiosClient.get(url, { headers });
+  }
   async createService(data){
     const url = "service/create"
     const accessToken = localStorage.getItem("ACCESS_TOKEN")
@@ -43,6 +51,38 @@ class ServiceApi {
       "content-type": "multipart/form-data"
     }
     return await axiosClient.post(url,data,{headers})
+  }
+  async getServiceOrder(data){
+    const url ='manager/service-order/get'
+    const accessToken = localStorage.getItem("ACCESS_TOKEN")
+    const headers = {
+      Authorization: `Bearer ${accessToken}`
+    }
+    return await axiosClient.post(url,data,{headers})
+  }
+  async confirmServiceOrder(id){
+    const url =`manager/service-order/cancel/${id}`
+    const accessToken = localStorage.getItem("ACCESS_TOKEN")
+    const headers = {
+      Authorization: `Bearer ${accessToken}`
+    }
+    return await axiosClient.get(url,{headers})
+  }
+  async cancelServiceOrder(id,data){
+    const url = `manager/service-order/cancel/${id}`
+    const accessToken = localStorage.getItem("ACCESS_TOKEN")
+    const headers = {
+      Authorization: `Bearer ${accessToken}`
+    }
+    return await axiosClient.post(url,data,{headers})
+  }
+  async markCompleteServiceOrder(id){
+    const url = `manager/service-order/mark-complete/${id}`
+    const accessToken = localStorage.getItem("ACCESS_TOKEN")
+    const headers = {
+      Authorization: `Bearer ${accessToken}`
+    }
+    return await axiosClient.get(url,{headers})
   }
 }
 const serviceApi = new ServiceApi();

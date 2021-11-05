@@ -13,16 +13,27 @@ import {
   notification,
   Popconfirm,
   Switch,
+  Tabs,
+  Row,
+  Col,
+  Space,
+  DatePicker,
+  Descriptions,
+  Image
 } from "antd";
 import {
   UploadOutlined,
   PlusOutlined,
   DeleteOutlined,
   EditOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FileSearchOutlined
 } from "@ant-design/icons";
 import productService from "../../services/product";
 import logo from "../../assert/thecutspa.png";
 import "./style.css";
+import { PRODUCT_ORDER_PAYMENT_METHOD, PRODUCT_ORDER_SHIPPING_METHOD, PRODUCT_ORDER_STATUS } from "../../constant";
 
 const { Option } = Select;
 
@@ -39,7 +50,7 @@ const Product = () => {
       dataIndex: "id",
       key: "id",
       defaultSortOrder: "descend",
-      sorter: (a, b) => a.id - b.id,
+      sorter: (a, b) => a.id - b.id
     },
     {
       title: "Name",
@@ -110,6 +121,104 @@ const Product = () => {
       ),
     },
   ];
+  const orderColumns = [
+    {
+      title: "Id",
+      dataIndex: "id",
+      key: "id",
+      render:(id)=>(<h4>#{id}</h4>)
+    },
+    {
+      title: "Receiver name",
+      dataIndex: "receiver_name",
+      key: "receiver_name"
+    },
+    {
+      title: "Created At",
+      dataIndex: "created_at",
+      key: "created_at"
+    },
+    {
+      title: "Shipping method",
+      dataIndex: "shipping_method",
+      key: "shipping_method",
+      render: (shippingMethod)=>{
+        console.log(shippingMethod)
+        switch (shippingMethod){
+          case PRODUCT_ORDER_SHIPPING_METHOD.STANDARD:
+            return (<Tag color='gold'>Standard ship</Tag>)
+          case PRODUCT_ORDER_SHIPPING_METHOD.FAST:
+            return (<Tag color='geekblue'>Fast ship</Tag>)
+          default: return null
+        }
+      }
+    },
+    {
+      title: "Payment method",
+      dataIndex: "payment_method",
+      key: "payment_method",
+      render: (paymentMethod)=>{
+        switch (paymentMethod){
+          case PRODUCT_ORDER_PAYMENT_METHOD.COD:
+            return (<Tag color='gold'>Cash on delivery</Tag>)
+          case PRODUCT_ORDER_PAYMENT_METHOD.CREDIT_CARD:
+            return (<Tag color='geekblue'>Cash online</Tag>)
+          default: return null
+        }
+      }
+    },
+    {
+      title: "Status",
+      key: "status",
+      render: (text,record)=>{
+        switch (record.status){
+          case PRODUCT_ORDER_STATUS.CUSTOMER_CANCEL: return (<Tag color='red'>Customer cancel</Tag>)
+          case PRODUCT_ORDER_STATUS.ADMIN_CANCEL: return (<Tag color='red'>Cancel</Tag>)
+          case PRODUCT_ORDER_STATUS.NOT_CONFIRM: return (
+            <Row>
+              <Col span={14}> 
+                <Tag color='yellow'>Just Order</Tag>
+              </Col>
+              <Col span={10} style={{justifyContent:'end'}}>
+                <Space direction='horizontal'>
+                  <Popconfirm title="Do you want to confirm ?" onConfirm={()=>onClickConfirmOrderHandler(record.id)}>
+                    <Button style={{ marginRight: 15}} type='primary' icon={<CheckCircleOutlined/>}>Confirm</Button>
+                  </Popconfirm>
+                  <Button 
+                    danger 
+                    icon={<ClockCircleOutlined/>} 
+                    onClick={()=>{
+                      setIsCancelOrderModalVisible(true)
+                      setDetailOrderInfo(record)
+                    }} 
+                    type='primary'
+                  >Cancel</Button>
+                </Space>
+              </Col>                                 
+            </Row>
+          )
+          case PRODUCT_ORDER_STATUS.CONFIRMED: return (<Tag color='blue'>Confirmed</Tag>)
+          case PRODUCT_ORDER_STATUS.DELIVERY: return (<Tag color='orange'>Delivery</Tag>)
+          case PRODUCT_ORDER_STATUS.COMPLETED: return (<Tag color='green'>Completed</Tag>)
+          default: return;
+        }
+      }
+    },
+    {
+      title: "Detail",
+      key: "contact_info",
+      render: (text, record)=>(
+        <
+          Button 
+          onClick={()=>{
+            setDetailOrderInfo(record)
+            setIsDetailOrderModalVisible(true)
+          }}
+          icon={<FileSearchOutlined />}
+          />
+      )
+    }
+  ]
   const [loading, setLoading] = useState(true);
   const [listProduct, setListProduct] = useState([]);
   const [isVisible, setIsVisivle] = useState(false);
@@ -117,23 +226,43 @@ const Product = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [isVisibleAdd, setIsVisivleAdd] = useState(false);
   const [subLoading, setSubLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("0")
+
+  const [listOrder,setListOrder] = useState([])
+  const [totalPage,setTotalPage] = useState(0)
+  const [filter,setFilter] = useState({})
+  const [cancelReasonText, setCancelReasonText] = useState('')
+  const [detailOrderInfo, setDetailOrderInfo] = useState()
+  const [isDetailOrderModalVisible,setIsDetailOrderModalVisible] = useState(false)
+  const [isCancelOrderModalVisible,setIsCancelOrderModalVisible] = useState(false)
 
   useEffect(() => {
-    fetchData();
+    fetchData().then(fetchDataOrder());
   }, [subLoading]);
 
   // fetch data
   const fetchData = async () => {
     global.loading.show();
-    const response = await productService.getAll();
-    global.loading.hide();
+    const response = await productService.getAll();  
     console.log(response);
     setListProduct(response.data.products);
     setListCategory(response.data.categories);
     setLoading(false);
     setSubLoading(false);
+    global.loading.hide();
   };
-
+  //fetch order data
+  const fetchDataOrder = async (filterData={}) => {
+    global.loading.show()
+    console.log("Order Data")
+    console.log(filterData)
+    const {data,code} = await productService.getProductOrder(filterData)
+    if(code === 200){
+      setListOrder(data.orders)
+      setTotalPage(data.maxOfPage)
+    }else openNotificationWithIcon('error',"Server Error")
+    global.loading.hide()
+  }
   //handle delete product
   const handleDelete = async (id) => {
     global.loading.show();
@@ -226,7 +355,64 @@ const Product = () => {
 
     return e.fileList;
   };
+  const onClickConfirmOrderHandler = async (id) =>{
+    global.loading.show()
+    const {code} = await productService.confirmProductOrder(id)
+    if(code === 200){
+      setListOrder(prev=>{
+        let updateData = [...prev]
+        const index = updateData.findIndex(order=>order.id===id)
+        updateData[index].status = PRODUCT_ORDER_STATUS.CONFIRMED
+        return updateData
+      })
+      openNotificationWithIcon('success',"Confirm order successfully")
+    }else openNotificationWithIcon('error','Fail')
+    global.loading.hide()
+  }
 
+  const onDateRangePickerChangeHandler = (dates) => {
+    let _filter = {}
+    if(dates){
+      _filter = {
+        ...filter,
+        fromDate: dates[0].toDate().toISOString().slice(0,10),
+        toDate: dates[1].toDate().toISOString().slice(0,10),
+        page: 1
+      }
+      setFilter(_filter)
+    } else {
+      _filter = {...filter,page: 1}
+      delete _filter['fromDate']
+      delete _filter['toDate']
+    }
+    setFilter(_filter)
+    fetchDataOrder(_filter)
+  } 
+
+  const onOrderTablePaginationChangeHandler = (page,itemPerPage) => {
+    let _filter = {
+      ...filter,
+      page,
+      itemPerPage
+    }
+    setFilter(_filter)
+    fetchDataOrder(_filter)
+  }
+  
+  const onClickCancelOrderHandler = async () => {
+    global.loading.show()
+    const {code} = await productService.cancelProductOrder(detailOrderInfo.id, {"cancelReason":cancelReasonText})
+    if(code === 200){
+      setListOrder((prev)=>{
+        let updateData = [...prev]
+        const index = updateData.findIndex(order=>order.id===detailOrderInfo.id)
+        updateData[index].status = PRODUCT_ORDER_STATUS.ADMIN_CANCEL
+        return updateData
+      })
+      openNotificationWithIcon('success',"Cancel order successfully")
+    } else openNotificationWithIcon('error',"Fail")
+    global.loading.hide()
+  }
   //render View
   if (loading) {
     return <Skeleton />;
@@ -237,8 +423,13 @@ const Product = () => {
         padding: 40,
       }}
     >
+      <Tabs defaultActiveKey="0" onChange={(value)=>setSelectedTab(value)} style={{marginLeft: '2vw'}}>
+        <Tabs.TabPane tab="Manage Product" key="0"/>     
+        <Tabs.TabPane tab="Manage Order" key="1"/>       
+      </Tabs>
+      {selectedTab === "0" && <React.Fragment>
       <PageHeader
-        title="Quản lí sản phẩm"
+        title="Product Management"
         className="site-page-header"
         avatar={{ logo }}
       ></PageHeader>
@@ -519,6 +710,116 @@ const Product = () => {
           </Form.Item>
         </Form>
       </Modal>
+      </React.Fragment>}
+      {selectedTab === "1" && <React.Fragment>
+        <PageHeader
+          title="Product Order Management"
+          className="site-page-header"
+          avatar={{ logo }}
+        ></PageHeader>
+        <DatePicker.RangePicker
+          format="YYYY-MM-DD"
+          onOk={(value)=>console.log(value)}
+          onChange={onDateRangePickerChangeHandler}
+          allowClear
+        />
+        <Table
+          rowKey={(record) => record.id}
+          dataSource={listOrder}
+          columns={orderColumns}
+          bordered="true"
+          pagination={{
+            total: totalPage,
+            onChange: onOrderTablePaginationChangeHandler
+          }}
+        />
+        <Modal
+          title="Detail information"
+          width= '80vw'
+          visible={isDetailOrderModalVisible}
+          onCancel={()=>setIsDetailOrderModalVisible(false)}
+          footer={<Button danger onClick={()=>setIsDetailOrderModalVisible(false)}>Close</Button>}
+        >
+          {detailOrderInfo && <React.Fragment>
+            <Descriptions title="Customer Info">
+                <Descriptions.Item label="ID">{detailOrderInfo.user_id}</Descriptions.Item>
+                <Descriptions.Item label="Username">{detailOrderInfo.receiver_name}</Descriptions.Item>
+                <Descriptions.Item label="Email">{detailOrderInfo.email}</Descriptions.Item>
+                <Descriptions.Item label="Phone">{detailOrderInfo.phone}</Descriptions.Item>
+                <Descriptions.Item label="Order Date">{detailOrderInfo.order_date}</Descriptions.Item>
+                <Descriptions.Item label="Address">{detailOrderInfo.address}</Descriptions.Item>
+                {detailOrderInfo.shippingMethod === PRODUCT_ORDER_SHIPPING_METHOD.STANDARD && <Descriptions.Item label="Shipping Method">Standard shipping</Descriptions.Item>}
+                {detailOrderInfo.shippingMethod === PRODUCT_ORDER_SHIPPING_METHOD.FAST && <Descriptions.Item label="Shipping Method">Fast shipping</Descriptions.Item>}
+                {detailOrderInfo.paymentMethod === PRODUCT_ORDER_PAYMENT_METHOD.COD && <Descriptions.Item label="Payment Method">Cash on delivery</Descriptions.Item>}
+                {detailOrderInfo.paymentMethod === PRODUCT_ORDER_PAYMENT_METHOD.CREDIT_CARD && <Descriptions.Item label="Payment Method">Cash online</Descriptions.Item>}
+            </Descriptions>
+            <PageHeader>Services</PageHeader>
+            <Table
+              rowKey={(record) => record.id}
+              dataSource={detailOrderInfo.products}
+              columns={[
+                {
+                  title: "ID",
+                  dataIndex: 'id',
+                  key: 'id'
+                },
+                {
+                  dataIndex: 'images',
+                  key: 'images',
+                  render: (images)=>(<Image style={{height: '20vh', width: '20vw'}} src={images.filePath}/>)
+                },
+                {
+                  title: 'Name',
+                  dataIndex: 'name',
+                  key:'name'
+                },
+                {
+                  title: 'Category',
+                  dataIndex: 'category_id',
+                  key: 'category',
+                  render: (id)=>{
+                    listCategory.forEach(category=>{
+                      if(category.id === id) return (<h5>{category.name}</h5>)
+                    })
+                  }
+                },
+                {
+                  title:'Price',
+                  dataIndex: 'price',
+                  key: 'price'
+                },
+                {
+                  title: 'Quantity',
+                  dataIndex: 'quantity',
+                  key: 'quantity'
+                }
+              ]}
+              bordered="true"
+            />
+            <Row justify='end'><h5>Total: </h5>{detailOrderInfo.amount} VND</Row>
+          </React.Fragment>}
+        </Modal>
+        <Modal
+          title="Cancel reason"
+          width= '40vw'
+          visible={isCancelOrderModalVisible}
+          okText='Cancel Order'
+          cancelText='Close'
+          onCancel={()=>{
+            setCancelReasonText('')
+            setIsCancelOrderModalVisible(false)
+          }}
+          onOk={onClickCancelOrderHandler}
+          okType='danger'
+        >
+          <Input.TextArea value={cancelReasonText} onChange={(val)=>{setCancelReasonText(val.currentTarget.value)}}/>
+          <Space direction='horizontal'>
+              <Tag color='gold' onClick={()=>setCancelReasonText("Cannot contact to customer")}>Cannot contact to customer</Tag>
+              <Tag color='gold' onClick={()=>setCancelReasonText("Customer cancel")}>Customer cancel</Tag>
+              <Tag color='gold' onClick={()=>setCancelReasonText("Product is not available")}>Service in not available</Tag>
+          </Space>
+        </Modal>
+      </React.Fragment>}
     </div>
   );
 };
