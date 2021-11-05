@@ -56,7 +56,6 @@ const UpdateStaffPage = (props) => {
     if (values.uploaded.length !== 0 && values.uploaded[0].status !== "done") {
       formData.append("file", values.uploaded[0].originFileObj);
     }
-    console.log(values.birthday.format("YYYY-MM-DD"));
     const respone = await staffService.updateStaff(values.staffId, formData);
     openNotificationWithIcon(respone.code ===200? 'success':'warning', respone.message);
   };
@@ -257,7 +256,6 @@ export default UpdateStaffPage;
 const AddFormInformation = (props) => {
   //handle upload image
   const uploadFile = (e) => {
-    console.log("Upload event:", e.fileList);
 
     if (Array.isArray(e)) {
       return e;

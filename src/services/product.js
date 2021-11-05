@@ -4,7 +4,6 @@ class ProductService {
   async searchProduct(params) {
     try {
       var response = await productApi.searchProduct(params);
-      // console.log(response);
     } catch (error) {
       return error.response.data;
     }
@@ -13,7 +12,6 @@ class ProductService {
   async getAll() {
     try {
       var response = await productApi.getAllProduct();
-      // console.log(response);
     } catch (error) {
       return error.response.data;
     }
@@ -22,7 +20,6 @@ class ProductService {
   async delete(productId) {
     try {
       var response = await productApi.deleteProduct(productId);
-      // console.log(response);
     } catch (error) {
       return error.response.data;
     }
@@ -31,7 +28,6 @@ class ProductService {
   async create(params) {
     try {
       var response = await productApi.createProduct(params);
-      // console.log(response);
     } catch (error) {
       return error.response.data;
     }
@@ -40,7 +36,6 @@ class ProductService {
   async update(params, productId) {
     try {
       var response = await productApi.updateProduct(params, productId);
-      // console.log(response);
     } catch (error) {
       return error.response.data;
     }

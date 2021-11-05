@@ -100,8 +100,6 @@ const StaffPage = () => {
     setListShift(responseShift.data.shifts);
     setListStaff(responseStaff.data.staffs);
     setListSkill(responeSkill.data.skills);
-    console.log(listStaff);
-    console.log(listSkill);
     setLoading(false);
     setSubLoading(false);
   };
@@ -110,14 +108,12 @@ const StaffPage = () => {
   const handleShowModalUpdate = (id) => {
     let staff = null;
     listStaff.forEach((item) => {
-      console.log(item.id);
       if (item.id === id) {
         staff = item;
       }
     });
     setSelectedStaff(staff);
     setIsVisibleUpdate(true);
-    console.log(staff);
   };
   //handle hide modal update
   const handleHideModalUpdate= async()=>{

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
@@ -393,7 +393,6 @@ const Service = () => {
     global.loading.hide()   
   }
   const onFinishFailed = (error) => {
-    console.log(error);
   };
 
   const onFinishCategoryForm = async (values) => {
@@ -713,7 +712,6 @@ const Service = () => {
         ></PageHeader>
         <DatePicker.RangePicker
           format="YYYY-MM-DD"
-          onOk={(value)=>console.log(value)}
           onChange={onDateRangePickerChangeHandler}
           allowClear
         />

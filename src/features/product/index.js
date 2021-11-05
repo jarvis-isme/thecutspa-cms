@@ -143,7 +143,6 @@ const Product = () => {
       dataIndex: "shipping_method",
       key: "shipping_method",
       render: (shippingMethod)=>{
-        console.log(shippingMethod)
         switch (shippingMethod){
           case PRODUCT_ORDER_SHIPPING_METHOD.STANDARD:
             return (<Tag color='gold'>Standard ship</Tag>)
@@ -244,7 +243,6 @@ const Product = () => {
   const fetchData = async () => {
     global.loading.show();
     const response = await productService.getAll();  
-    console.log(response);
     setListProduct(response.data.products);
     setListCategory(response.data.categories);
     setLoading(false);
@@ -254,8 +252,6 @@ const Product = () => {
   //fetch order data
   const fetchDataOrder = async (filterData={}) => {
     global.loading.show()
-    console.log("Order Data")
-    console.log(filterData)
     const {data,code} = await productService.getProductOrder(filterData)
     if(code === 200){
       setListOrder(data.orders)
@@ -269,7 +265,6 @@ const Product = () => {
     setSubLoading(true);
     const response = await productService.delete(id);
     global.loading.hide();
-    console.log(response);
   };
 
   //handle show modal
@@ -280,7 +275,6 @@ const Product = () => {
         result = product;
       }
     });
-    console.log(result);
     setSelectedItem(result);
     setIsVisivle(true);
   };
@@ -338,7 +332,6 @@ const Product = () => {
 
   // error when input is not finished
   const onFinishFailed = (error) => {
-    console.log(error);
   };
 
   // handle event show modal add product
@@ -348,7 +341,6 @@ const Product = () => {
 
   //handle choose a file
   const uploadFile = (e) => {
-    console.log("Upload event:", e.fileList);
 
     if (Array.isArray(e)) {
       return e;
@@ -726,7 +718,6 @@ const Product = () => {
         ></PageHeader>
         <DatePicker.RangePicker
           format="YYYY-MM-DD"
-          onOk={(value)=>console.log(value)}
           onChange={onDateRangePickerChangeHandler}
           allowClear
         />
