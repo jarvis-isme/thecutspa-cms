@@ -565,7 +565,7 @@ const Service = () => {
                   },
                 ]}
               >
-                <Upload maxCount={1} beforeUpload={()=>false}>
+                <Upload maxCount={1} beforeUpload={()=>true}>
                   <Button icon={<UploadOutlined />}>Upload</Button>
                 </Upload>
               </Form.Item>
@@ -684,7 +684,7 @@ const Service = () => {
               </Form.Item>
               
               <Form.Item label="Image">
-                <Image style src={selectedItem && selectedItem.images ? selectedItem.images.filePath : ""} />              
+                <Image style={{height: '45vh', width: '35vw'}} src={selectedItem && selectedItem.images ? selectedItem.images.filePath : ""} />              
               </Form.Item>
               <Form.Item 
                 label=" " 
@@ -696,7 +696,7 @@ const Service = () => {
                   },
                 ]}
               >
-                <Upload maxCount={1} beforeUpload={()=>false}>
+                <Upload maxCount={1} beforeUpload={()=>true}>
                   <Button icon={<UploadOutlined />}>Upload</Button>
                 </Upload>
               </Form.Item>
