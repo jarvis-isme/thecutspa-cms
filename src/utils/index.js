@@ -13,7 +13,6 @@ export function handleShifts(object) {
   keys.forEach((item) => {
     if (object[item]) {
       listShifts= listShifts.concat(object[item]);
-      console.log(listShifts);
     }
   });
   return listShifts;
@@ -36,9 +35,7 @@ export function handleSkills(values){
 export function handleShift(values) {
   let listShifts = [];
   values.forEach((item) => {
-    console.log(item.id);
    listShifts = listShifts.concat(item.id);
   });
-  console.log(listShifts);
   return listShifts;
 }

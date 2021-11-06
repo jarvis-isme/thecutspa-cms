@@ -4,7 +4,6 @@ import NotFound from './components/common/not_found';
 import { Redirect, Route, Switch } from 'react-router';
 import Loading from './components/loading';
 import ManagerLayout from './components/layout/manager';
-import { USER_ROLE } from './constant';
 import PrivateRouter from './components/common/private_router';
 
 
@@ -20,11 +19,9 @@ function App() {
           <Login />
         </Route>
         <Route path="/admin">
-          {/* {global.role !== USER_ROLE.ADMIN && <Redirect to='/private'/>} */}
           <AdminLayout/>
         </Route>
         <Route path="/manager">
-          {/* {global.role !== USER_ROLE.MANAGER && <Redirect to='/private'/>} */}
           <ManagerLayout/>
         </Route>
         <Route exact path="/private">

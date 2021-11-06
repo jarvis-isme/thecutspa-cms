@@ -37,9 +37,7 @@ const CreateStaffPage = (props) => {
     },
   ];
   const handleAdd = async (values) => {
-    console.log(values);
     const shitfIds = handleShifts(values);
-    console.log(shitfIds);
     const formData = new FormData();
     formData.append("name", values.name);
     if (values.email) {
@@ -51,7 +49,6 @@ const CreateStaffPage = (props) => {
       formData.append(`shiftIds[${index}]`, item);
     });
     values.skills.forEach((item, index) => {
-      console.log('test');
       formData.append(`skillIds[${index}]`, item);
     });
     formData.append("birthDay", values.birthday.format("YYYY-MM-DD"));
@@ -59,9 +56,7 @@ const CreateStaffPage = (props) => {
     if (values.uploaded.length !== 0) {
       formData.append("file", values.uploaded[0].originFileObj);
     }
-    console.log(values.birthday.format("YYYY-MM-DD"));
     const respone = await staffService.createStaff(formData);
-    console.log(respone);
     if(respone.code===200){
       openNotificationWithIcon('success',respone.message);
     }else{
@@ -208,7 +203,6 @@ export default CreateStaffPage;
 const AddFormInformation = (props) => {
   //handle upload image
   const uploadFile = (e) => {
-    console.log("Upload event:", e.fileList);
 
     if (Array.isArray(e)) {
       return e;

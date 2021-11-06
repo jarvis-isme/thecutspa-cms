@@ -4,7 +4,6 @@ class ServiceService{
     async getAllWithCategory(){
         try {
             var response = await serviceApi.getAllService();
-            // console.log(response);
           } catch (error) {
             return error.response.data;
           }
@@ -13,7 +12,6 @@ class ServiceService{
     async getAllServiceCategory(){
       try {
         var response = await serviceApi.getAllServiceCategory();
-        // console.log(response);
       } catch (error) {
         return error.response.data;
       }
@@ -22,9 +20,7 @@ class ServiceService{
     async createService(data){
       try {
         var response = await serviceApi.createService(data)
-        console.log(response);
       } catch (error) {
-        console.log(error)
         return error.response.data
       }
       return response;
@@ -64,7 +60,6 @@ class ServiceService{
     async confirmServiceOrder(id){
       try {
         var response = await serviceApi.confirmServiceOrder(id)
-        console.log(response)
       } catch (error) {
         return error
       }

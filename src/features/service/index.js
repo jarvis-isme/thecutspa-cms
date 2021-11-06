@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Button,
@@ -393,7 +393,6 @@ const Service = () => {
     global.loading.hide()   
   }
   const onFinishFailed = (error) => {
-    console.log(error);
   };
 
   const onFinishCategoryForm = async (values) => {
@@ -566,7 +565,7 @@ const Service = () => {
                   },
                 ]}
               >
-                <Upload maxCount={1} beforeUpload={()=>false}>
+                <Upload maxCount={1} beforeUpload={()=>true}>
                   <Button icon={<UploadOutlined />}>Upload</Button>
                 </Upload>
               </Form.Item>
@@ -685,7 +684,7 @@ const Service = () => {
               </Form.Item>
               
               <Form.Item label="Image">
-                <Image style src={selectedItem && selectedItem.images ? selectedItem.images.filePath : ""} />              
+                <Image style={{height: '45vh', width: '35vw'}} src={selectedItem && selectedItem.images ? selectedItem.images.filePath : ""} />              
               </Form.Item>
               <Form.Item 
                 label=" " 
@@ -697,7 +696,7 @@ const Service = () => {
                   },
                 ]}
               >
-                <Upload maxCount={1} beforeUpload={()=>false}>
+                <Upload maxCount={1} beforeUpload={()=>true}>
                   <Button icon={<UploadOutlined />}>Upload</Button>
                 </Upload>
               </Form.Item>
@@ -713,7 +712,6 @@ const Service = () => {
         ></PageHeader>
         <DatePicker.RangePicker
           format="YYYY-MM-DD"
-          onOk={(value)=>console.log(value)}
           onChange={onDateRangePickerChangeHandler}
           allowClear
         />

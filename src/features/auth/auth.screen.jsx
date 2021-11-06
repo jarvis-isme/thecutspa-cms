@@ -27,7 +27,6 @@ const Login = (props) => {
     global.loading.show();
     const respone = await userService.loginService(params);
     global.loading.hide();
-    console.log(props);
     if (respone.code === 200 && (respone.data.user.role_id === USER_ROLE.ADMIN || respone.data.user.role_id === USER_ROLE.MANAGER)) {
       localStorage.setItem("ACCESS_TOKEN", respone.data.token);
       localStorage.setItem("ROLE", respone.data.user.role_id);
@@ -40,7 +39,6 @@ const Login = (props) => {
   };
 
   const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
   };
   return (
     <Space
