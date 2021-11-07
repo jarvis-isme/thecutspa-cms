@@ -294,7 +294,8 @@ const Product = () => {
     }
     params.append("description", values.description);
     params.append("quantity", values.quantity);
-    params.append("status", values.status === true ? 1 : 0);
+    params.append("status",(Boolean( values.status) === true ) ? 1:0 );
+    console.log(values);
     params.append("price", values.price);
     setSubLoading(true);
     const response = await productService.update(params, values.productId);
@@ -322,7 +323,7 @@ const Product = () => {
     setSubLoading(true);
     const response = await productService.create(params);
     if (response.code === 200) {
-      setSubLoading(false);
+      setSubLoading(true);
       setIsVisivleAdd(false);
       openNotificationWithIcon("success", response.message);
     } else {
