@@ -61,7 +61,7 @@ class ServiceApi {
     return await axiosClient.post(url,data,{headers})
   }
   async confirmServiceOrder(id){
-    const url =`manager/service-order/cancel/${id}`
+    const url =`manager/service-order/confirm/${id}`
     const accessToken = localStorage.getItem("ACCESS_TOKEN")
     const headers = {
       Authorization: `Bearer ${accessToken}`

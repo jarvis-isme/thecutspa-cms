@@ -526,7 +526,7 @@ const Product = () => {
             >
               <Input.TextArea autoSize />
             </Form.Item>
-            <Form.Item label="Category" name="category" initialValue={1}>
+            <Form.Item label="Category" name="category" initialValue={selectedItem ? selectedItem.category_id: 0}>
               <Select
                 name="category"
                 defaultValue={selectedItem ? selectedItem.category_id : 1}
