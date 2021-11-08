@@ -451,7 +451,7 @@ const Service = () => {
     if(code === 200){
       setListOrder((prev)=>{
         let updateData = [...prev]
-        const index = updateData.findIndex(order=>order.id===detailOrderInfo.id)
+        const index = updateData.findIndex(order=>order.id===id)
         updateData[index].status = SERVICE_ORDER_STATUS.USED
         return updateData
       })
